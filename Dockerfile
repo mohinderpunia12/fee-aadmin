@@ -20,7 +20,8 @@ RUN apk add --no-cache \
     procps
 
 # Install PHP extensions required for Laravel + Filament + PostgreSQL
-RUN docker-php-ext-install \
+# Using parallel builds to speed up compilation
+RUN docker-php-ext-install -j$(nproc) \
     pdo_mysql \
     pdo_pgsql \
     pgsql \

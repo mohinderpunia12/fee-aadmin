@@ -55,6 +55,10 @@ if ! pgrep -x php-fpm > /dev/null; then
   exit 1
 fi
 
+# Verify nginx config
+echo "Testing nginx configuration..."
+nginx -t
+
 # Start Nginx in foreground (this keeps container alive)
 echo "Starting Nginx on 0.0.0.0:80..."
 exec nginx -g 'daemon off;'
