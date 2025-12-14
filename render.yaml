@@ -73,14 +73,14 @@ services:
     healthCheckPath: /
     autoDeploy: true
 
+  - type: redis
+    name: fee-admin-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+
 databases:
   - name: fee-admin-db
     plan: starter
     databaseName: feeadmin
     user: feeadmin
-
-  - name: fee-admin-redis
-    type: redis
-    plan: starter
-    maxmemoryPolicy: allkeys-lru
 
