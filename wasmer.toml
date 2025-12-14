@@ -10,8 +10,13 @@ description = "Multi-Tenant School Management SaaS"
 # PHP version - use 8.4 to match composer.lock requirements
 php = "8.4"
 
-# Build command - fix Dockerfile after Shipit generates it, then build
-build-command = "bash -c 'find . -path \"*/.shipit/docker/Dockerfile\" -type f -exec sed -i \"/pie install php\\/pdo_pgsql/d\" {} \\; -exec sed -i \"/libpq-dev/d\" {} \\; -exec sed -i \"/postgresql-dev/d\" {} \\; && composer install --optimize-autoloader --no-dev --no-scripts && npm ci && npm run build'"
+# Build command
+# Note: This runs inside Docker build, so we can't fix the Dockerfile here
+# The fix must happen via hooks or prepare script
+build-command = "composer install --optimize-autoloader --no-dev --no-scripts && npm ci && npm run build"
 
 # Start command  
 start-command = "php artisan serve --host=0.0.0.0 --port=8080"
+
+# Database: Use MySQL ONLY - pdo_mysql is included in PHP by default
+# PostgreSQL extensions are NOT needed and will cause build failures

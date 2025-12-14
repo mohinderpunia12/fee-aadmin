@@ -1,0 +1,12 @@
+# Shipit configuration
+# Prevent PostgreSQL detection and installation
+
+[detection]
+# Ignore PostgreSQL extensions during auto-detection
+ignore-extensions = ["pdo_pgsql", "pgsql"]
+ignore-packages = ["libpq-dev", "postgresql-dev", "postgresql"]
+
+[build]
+# Use MySQL only
+database = "mysql"
+
