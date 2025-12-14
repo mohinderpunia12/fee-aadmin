@@ -42,11 +42,20 @@ if [ "$APP_ENV" = "production" ]; then
   php artisan view:cache || true
 fi
 
-# Start PHP-FPM in background
+# Start PHP-FPM in background (daemon mode)
 echo "Starting PHP-FPM..."
 php-fpm -D
 
-# Start Nginx in foreground
-echo "Starting Nginx..."
+# Wait a moment for PHP-FPM to start
+sleep 2
+
+# Verify PHP-FPM is running
+if ! pgrep -x php-fpm > /dev/null; then
+  echo "ERROR: PHP-FPM failed to start!"
+  exit 1
+fi
+
+# Start Nginx in foreground (this keeps container alive)
+echo "Starting Nginx on 0.0.0.0:80..."
 exec nginx -g 'daemon off;'
 
