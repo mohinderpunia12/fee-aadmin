@@ -1,32 +1,64 @@
 #!/bin/bash
 # Shipit prepare script - runs before packaging
-# This modifies the auto-generated Dockerfile to remove PostgreSQL
+# This modifies the auto-generated Dockerfile to remove PostgreSQL installation
 
 cd /app
 
-echo "Shipit prepare: Removing PostgreSQL from Dockerfile..."
+echo "=== Shipit Prepare: Removing PostgreSQL from Dockerfile ==="
 
-# Wait for Dockerfile to be generated (it might be generated during this phase)
-sleep 2
+# Function to fix Dockerfile
+fix_dockerfile() {
+    local file="$1"
+    if [ ! -f "$file" ]; then
+        return 1
+    fi
+    
+    echo "Fixing $file..."
+    
+    # Create backup
+    cp "$file" "${file}.bak"
+    
+    # Remove PostgreSQL-related lines using multiple patterns
+    sed -i \
+        -e '/pie install.*pdo_pgsql/d' \
+        -e '/pie install.*pgsql/d' \
+        -e '/RUN pie install.*pdo_pgsql/d' \
+        -e '/RUN pie install.*pgsql/d' \
+        -e '/php\/pdo_pgsql/d' \
+        -e '/php\/pgsql/d' \
+        -e '/libpq-dev/d' \
+        -e '/postgresql-dev/d' \
+        -e '/postgresql/d' \
+        "$file"
+    
+    # Show what was removed
+    if ! diff -q "${file}.bak" "$file" > /dev/null 2>&1; then
+        echo "Changes made to $file:"
+        diff "${file}.bak" "$file" | head -20 || true
+    else
+        echo "No PostgreSQL references found in $file"
+    fi
+    
+    return 0
+}
 
-# Find and modify Dockerfile
-for dockerfile in .shipit/docker/Dockerfile Dockerfile .shipit/Dockerfile; do
-    if [ -f "$dockerfile" ]; then
-        echo "Found Dockerfile at $dockerfile, removing PostgreSQL..."
-        
-        # Remove PostgreSQL installation lines
-        sed -i.bak \
-            -e '/pie install php\/pdo_pgsql/d' \
-            -e '/RUN pie install php\/pdo_pgsql/d' \
-            -e '/php\/pdo_pgsql/d' \
-            -e '/libpq-dev/d' \
-            -e '/postgresql-dev/d' \
-            "$dockerfile"
-        
-        echo "Modified $dockerfile"
+# Try multiple locations where Shipit might generate the Dockerfile
+FIXED=0
+for dockerfile in \
+    ".shipit/docker/Dockerfile" \
+    "Dockerfile" \
+    ".shipit/Dockerfile" \
+    "out/.shipit/docker/Dockerfile" \
+    ".shipit/out/docker/Dockerfile"; do
+    if fix_dockerfile "$dockerfile"; then
+        FIXED=1
         break
     fi
 done
 
-echo "Prepare complete"
+if [ $FIXED -eq 0 ]; then
+    echo "Warning: No Dockerfile found to fix (this is okay if Shipit hasn't generated it yet)"
+    echo "The fix will be applied when Shipit generates the Dockerfile"
+fi
 
+echo "=== Prepare complete ==="
