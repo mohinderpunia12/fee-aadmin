@@ -1,14 +1,9 @@
-# Shipit configuration for Wasmer
-# This tells Shipit how to build the application
-
+# Shipit configuration to prevent PostgreSQL detection
 [build]
-# PHP version
-php = "8.4"
-
-# Database: MySQL only, NO PostgreSQL
-# Shipit auto-detects extensions, but we'll override in hooks
+# Explicitly tell Shipit to only use MySQL
 database = "mysql"
 
-# Build hooks
-[build.hooks]
-pre-build = ".shipit/hooks/pre-build.sh"
+# Don't auto-detect PostgreSQL
+[detection]
+ignore-extensions = ["pdo_pgsql", "pgsql"]
+

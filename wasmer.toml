@@ -7,15 +7,14 @@ version = "1.0.0"
 description = "Multi-Tenant School Management SaaS"
 
 [build]
-# PHP version - use 8.4 to match composer.lock requirements
+# PHP version - use 8.4 to match composer.lock requirements  
 php = "8.4"
 
-# Build command
-build-command = "composer install --optimize-autoloader --no-dev --no-scripts && npm ci && npm run build"
+# Build command - fix Dockerfile before building
+build-command = "bash -c 'if [ -f .shipit/docker/Dockerfile ]; then sed -i \"/pie install php\\/pdo_pgsql/d\" .shipit/docker/Dockerfile && sed -i \"/libpq-dev/d\" .shipit/docker/Dockerfile && sed -i \"/postgresql-dev/d\" .shipit/docker/Dockerfile; fi && composer install --optimize-autoloader --no-dev --no-scripts && npm ci && npm run build'"
 
 # Start command  
 start-command = "php artisan serve --host=0.0.0.0 --port=8080"
 
-# Database: Use MySQL ONLY (pdo_mysql is included in PHP by default)
-# IMPORTANT: Do NOT install PostgreSQL extensions
-# The prepare.sh script will remove any PostgreSQL installation attempts
+# Database: Use MySQL ONLY - pdo_mysql is included in PHP by default
+# PostgreSQL extensions are NOT needed and will cause build failures
