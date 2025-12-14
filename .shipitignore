@@ -1,0 +1,6 @@
+# Shipit ignore file for Wasmer
+# This tells Shipit to ignore certain files/directories during build
+
+# Ignore PostgreSQL-related configurations
+config/database.php
+

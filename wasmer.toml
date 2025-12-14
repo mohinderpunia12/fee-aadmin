@@ -1,0 +1,21 @@
+# Wasmer configuration file
+# This configures how Wasmer builds and deploys your application
+
+[package]
+name = "fee-admin"
+version = "1.0.0"
+description = "Multi-Tenant School Management SaaS"
+
+[build]
+# Use MySQL, not PostgreSQL
+extensions = ["pdo_mysql", "mbstring", "exif", "pcntl", "bcmath", "gd", "zip", "intl"]
+
+# PHP version
+php = "8.4"
+
+# Build command
+build-command = "composer install --optimize-autoloader --no-dev && npm ci && npm run build"
+
+# Start command
+start-command = "php artisan serve --host=0.0.0.0 --port=8080"
+
