@@ -53,21 +53,11 @@ services:
         value: redis
       - key: QUEUE_CONNECTION
         value: redis
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
           name: fee-admin-redis
           type: redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          name: fee-admin-redis
-          type: redis
-          property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          name: fee-admin-redis
-          type: redis
-          property: password
+          property: connectionString
     buildCommand: ""
     startCommand: ""
     healthCheckPath: /
@@ -77,6 +67,7 @@ services:
     name: fee-admin-redis
     plan: starter
     maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
 
 databases:
   - name: fee-admin-db
