@@ -1,9 +1,0 @@
-# Shipit configuration to prevent PostgreSQL detection
-[build]
-# Use custom Dockerfile instead of auto-generating
-dockerfile = "Dockerfile.wasmer"
-
-# Don't auto-detect database extensions
-[detection]
-ignore-extensions = ["pdo_pgsql", "pgsql"]
-ignore-packages = ["libpq-dev", "postgresql-dev"]

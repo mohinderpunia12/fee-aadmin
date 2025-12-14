@@ -10,6 +10,7 @@ RUN apk add --no-cache \
     zip \
     unzip \
     oniguruma-dev \
+    postgresql-dev \
     icu-dev \
     mysql-client \
     nodejs \
@@ -22,6 +23,7 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     exif \
     pcntl \
