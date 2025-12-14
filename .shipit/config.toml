@@ -2,13 +2,15 @@
 # Prevent PostgreSQL detection and installation
 
 [detection]
-# Ignore PostgreSQL extensions during auto-detection
-ignore-extensions = ["pdo_pgsql", "pgsql"]
-ignore-packages = ["libpq-dev", "postgresql-dev", "postgresql"]
+# Completely ignore PostgreSQL during auto-detection
+ignore-extensions = ["pdo_pgsql", "pgsql", "ext-pgsql"]
+ignore-packages = ["libpq-dev", "postgresql-dev", "postgresql", "libpq5"]
 
 [build]
-# Use MySQL only
+# Use MySQL only - explicitly tell Shipit
 database = "mysql"
-# Use custom Dockerfile if available
-dockerfile = "Dockerfile.wasmer"
+# Only install MySQL extensions
+extensions = ["pdo_mysql"]
 
+# Use custom Dockerfile if Shipit supports it
+# dockerfile = "Dockerfile.wasmer"
