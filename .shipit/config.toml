@@ -5,15 +5,10 @@
 # PHP version
 php = "8.4"
 
-# Database extensions - only MySQL, skip PostgreSQL
-# Shipit will auto-detect, but we can override here
-extensions = []
+# Database: MySQL only, NO PostgreSQL
+# Shipit auto-detects extensions, but we'll override in hooks
+database = "mysql"
 
-# Skip auto-detection of PostgreSQL
-skip-extensions = ["pdo_pgsql", "pgsql"]
-
-# Build settings
-[build.docker]
-# Use custom Dockerfile if available
-dockerfile = "Dockerfile.wasmer"
-
+# Build hooks
+[build.hooks]
+pre-build = ".shipit/hooks/pre-build.sh"

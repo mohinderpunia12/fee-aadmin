@@ -1,8 +1,9 @@
 # Custom Dockerfile for Wasmer deployment
-# This overrides the auto-generated Dockerfile to use MySQL instead of PostgreSQL
+# This is a reference - Shipit may auto-generate, but this shows the correct structure
 
 FROM debian:trixie-slim AS build
 
+# Install build dependencies - MySQL only, NO PostgreSQL
 RUN apt-get update \
     && apt-get -y --no-install-recommends install \
         build-essential gcc make autoconf libtool bison \
@@ -34,9 +35,10 @@ RUN mise use --global pnpm
 ENV HOME=/root COMPOSER_FUND=0
 WORKDIR /app
 
-# DO NOT install PostgreSQL extensions - we're using MySQL only
+# IMPORTANT: DO NOT install PostgreSQL extensions
 # pdo_mysql is included in PHP by default from mise
-# Skip any PIE extension installation to avoid phpize errors
+# If you need to install extensions, use: pie install php/pdo_mysql
+# But pdo_mysql should already be available, so skip extension installation
 
 RUN \
   --mount=type=bind,source=composer.json,target=composer.json \
@@ -57,4 +59,3 @@ RUN pnpm run build
 
 FROM scratch
 COPY --from=build /app /app
-
