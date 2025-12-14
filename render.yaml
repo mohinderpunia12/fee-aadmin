@@ -1,77 +1,10 @@
-services:
-  - type: web
-    name: fee-admin
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: APP_NAME
-        value: FeeAdmin
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
-      - key: APP_URL
-        sync: false
-      - key: LOG_CHANNEL
-        value: stderr
-      - key: LOG_LEVEL
-        value: error
-      - key: DB_CONNECTION
-        value: mysql
-      - key: DB_HOST
-        fromDatabase:
-          name: fee-admin-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: fee-admin-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: fee-admin-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: fee-admin-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: fee-admin-db
-          property: password
-      - key: SESSION_DRIVER
-        value: database
-      - key: SESSION_SECURE_COOKIE
-        value: true
-      - key: SESSION_HTTP_ONLY
-        value: true
-      - key: SESSION_SAME_SITE
-        value: lax
-      - key: CACHE_DRIVER
-        value: redis
-      - key: QUEUE_CONNECTION
-        value: redis
-      - key: REDIS_URL
-        fromService:
-          name: fee-admin-redis
-          type: redis
-          property: connectionString
-    buildCommand: ""
-    startCommand: ""
-    healthCheckPath: /
-    autoDeploy: true
-
-  - type: redis
-    name: fee-admin-redis
-    plan: starter
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
-
-databases:
-  - name: fee-admin-db
-    plan: starter
-    databaseName: feeadmin
-    user: feeadmin
+# This file is kept for reference but deployment should be done manually
+# See DEPLOYMENT.md for step-by-step instructions
+# 
+# To deploy:
+# 1. Create a Web Service in Render Dashboard
+# 2. Set Environment to "Docker"
+# 3. Point to this Dockerfile
+# 4. Create Database and Redis services separately
+# 5. Configure environment variables manually
 
