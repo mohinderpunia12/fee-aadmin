@@ -1,0 +1,32 @@
+#!/bin/bash
+# Shipit prepare script - runs before packaging
+# This modifies the auto-generated Dockerfile to remove PostgreSQL
+
+cd /app
+
+echo "Shipit prepare: Removing PostgreSQL from Dockerfile..."
+
+# Wait for Dockerfile to be generated (it might be generated during this phase)
+sleep 2
+
+# Find and modify Dockerfile
+for dockerfile in .shipit/docker/Dockerfile Dockerfile .shipit/Dockerfile; do
+    if [ -f "$dockerfile" ]; then
+        echo "Found Dockerfile at $dockerfile, removing PostgreSQL..."
+        
+        # Remove PostgreSQL installation lines
+        sed -i.bak \
+            -e '/pie install php\/pdo_pgsql/d' \
+            -e '/RUN pie install php\/pdo_pgsql/d' \
+            -e '/php\/pdo_pgsql/d' \
+            -e '/libpq-dev/d' \
+            -e '/postgresql-dev/d' \
+            "$dockerfile"
+        
+        echo "Modified $dockerfile"
+        break
+    fi
+done
+
+echo "Prepare complete"
+
