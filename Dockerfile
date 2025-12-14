@@ -48,8 +48,13 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --optim
 # Copy application files
 COPY . .
 
-# Complete composer setup
-RUN composer dump-autoload --optimize --classmap-authoritative
+# Create necessary directories for Laravel before composer dump-autoload
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views \
+    storage/logs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+# Complete composer setup (skip scripts to avoid Laravel commands during build)
+RUN composer dump-autoload --optimize --classmap-authoritative --no-scripts
 
 # Install Node dependencies and build assets
 RUN npm ci && npm run build && rm -rf node_modules
