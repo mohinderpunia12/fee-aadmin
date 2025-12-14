@@ -1,0 +1,19 @@
+# Shipit configuration for Wasmer
+# This tells Shipit how to build the application
+
+[build]
+# PHP version
+php = "8.4"
+
+# Database extensions - only MySQL, skip PostgreSQL
+# Shipit will auto-detect, but we can override here
+extensions = []
+
+# Skip auto-detection of PostgreSQL
+skip-extensions = ["pdo_pgsql", "pgsql"]
+
+# Build settings
+[build.docker]
+# Use custom Dockerfile if available
+dockerfile = "Dockerfile.wasmer"
+

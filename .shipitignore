@@ -1,6 +1,9 @@
-# Shipit ignore file for Wasmer
-# This tells Shipit to ignore certain files/directories during build
+# Shipit ignore file - tells Shipit what to ignore during build
 
-# Ignore PostgreSQL-related configurations
+# Ignore PostgreSQL-related files
+**/pgsql*
+**/postgres*
 config/database.php
 
+# Ignore Dockerfile (we have Dockerfile.wasmer)
+Dockerfile

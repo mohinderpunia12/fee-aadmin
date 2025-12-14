@@ -28,16 +28,15 @@ RUN mise use --global ubi:composer/composer
 RUN composer_dir=$(mise where ubi:composer/composer); ln -s "$composer_dir/bin/composer" /usr/local/bin/composer
 RUN apt-get update && apt-get -y --no-install-recommends install \
     gcc make autoconf libtool bison \
-    php-dev php-pear \
     && rm -rf /var/lib/apt/lists/*
 RUN curl -L --output /usr/bin/pie https://github.com/php/pie/releases/download/v1.2.0/pie.phar && chmod +x /usr/bin/pie
 RUN mise use --global pnpm
 ENV HOME=/root COMPOSER_FUND=0
 WORKDIR /app
 
-# Install MySQL extension - pdo_mysql is usually included in PHP, but if needed:
-# Note: PIE might not work without proper phpize, so we'll rely on PHP's built-in extensions
-# The PHP from mise should already have pdo_mysql enabled
+# DO NOT install PostgreSQL extensions - we're using MySQL only
+# pdo_mysql is included in PHP by default from mise
+# Skip any PIE extension installation to avoid phpize errors
 
 RUN \
   --mount=type=bind,source=composer.json,target=composer.json \
