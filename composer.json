@@ -15,11 +15,6 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "spatie/laravel-pdf": "*",
-        "symfony/clock": "^7.0",
-        "symfony/css-selector": "^7.0",
-        "symfony/event-dispatcher": "^7.0",
-        "symfony/string": "^7.0",
-        "symfony/translation": "^7.0",
         "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
