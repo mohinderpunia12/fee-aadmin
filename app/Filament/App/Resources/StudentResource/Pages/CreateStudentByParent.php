@@ -201,13 +201,6 @@ class CreateStudentByParent extends Page implements HasForms
                                 ->label('Classroom')
                                 ->options(fn () => Classroom::query()->pluck('name', 'id'))
                                 ->searchable(),
-                            Forms\Components\TextInput::make('class')
-                                ->label('Class')
-                                ->required()
-                                ->maxLength(255),
-                            Forms\Components\TextInput::make('section')
-                                ->label('Section')
-                                ->maxLength(255),
                             Forms\Components\Select::make('gender')
                                 ->label('Gender')
                                 ->options([

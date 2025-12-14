@@ -11,11 +11,16 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Tables;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
-class Fees extends Page implements HasForms
+class Fees extends Page implements HasForms, HasTable
 {
     use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'Fees';
@@ -24,6 +29,7 @@ class Fees extends Page implements HasForms
     protected static string $view = 'filament.app.pages.fees';
 
     public ?array $data = [];
+    public bool $showForm = false;
 
     public function mount(): void
     {
@@ -37,6 +43,100 @@ class Fees extends Page implements HasForms
             'parent_payment_amount' => null,
             'parent_custom_amount' => null,
         ]);
+    }
+
+    public function showAddForm(): void
+    {
+        $this->showForm = true;
+    }
+
+    public function cancelForm(): void
+    {
+        $this->showForm = false;
+        $this->form->fill([
+            'mode' => 'monthly',
+            'payment_date' => now()->toDateString(),
+            'academic_year' => now()->format('Y') . '-' . now()->addYear()->format('Y'),
+            'parent_search' => null,
+            'parent_phone' => null,
+            'parent_name_display' => null,
+            'parent_payment_amount' => null,
+            'parent_custom_amount' => null,
+        ]);
+    }
+
+    protected function getTableQuery(): Builder
+    {
+        $tenant = \Filament\Facades\Filament::getTenant();
+        if (!$tenant) {
+            return FeeTransaction::query()->whereRaw('1 = 0');
+        }
+
+        return FeeTransaction::query()
+            ->where('school_id', $tenant->id)
+            ->with(['ledger.student'])
+            ->orderBy('payment_date', 'desc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    protected function getTableColumns(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('payment_date')
+                ->date()
+                ->sortable()
+                ->label('Payment Date'),
+            Tables\Columns\TextColumn::make('ledger.student.name')
+                ->label('Student')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->whereHas('ledger.student', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+                }),
+            Tables\Columns\TextColumn::make('ledger.student.enrollment_no')
+                ->label('Enrollment No')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->whereHas('ledger.student', function ($q) use ($search) {
+                        $q->where('enrollment_no', 'like', "%{$search}%");
+                    });
+                }),
+            Tables\Columns\TextColumn::make('ledger.academic_year')
+                ->label('Academic Year')
+                ->sortable(),
+            Tables\Columns\TextColumn::make('receipt_no')
+                ->label('Receipt No')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('paid_amount')
+                ->money('INR')
+                ->sortable()
+                ->label('Amount Paid'),
+            Tables\Columns\TextColumn::make('payment_method')
+                ->label('Payment Method')
+                ->searchable(),
+        ];
+    }
+
+    protected function getTableActions(): array
+    {
+        return [
+            Tables\Actions\Action::make('download_receipt')
+                ->label('Download Receipt')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(fn (FeeTransaction $record) => route('receipts.fee.transaction.download', $record->id))
+                ->openUrlInNewTab(),
+        ];
+    }
+
+    protected function getTableHeaderActions(): array
+    {
+        return [
+            Tables\Actions\Action::make('add_payment')
+                ->label('Add Fee Payment')
+                ->icon('heroicon-o-plus')
+                ->button()
+                ->action('showAddForm'),
+        ];
     }
 
     protected function getFormStatePath(): string
@@ -313,7 +413,7 @@ class Fees extends Page implements HasForms
                 $extraNote = "\nMonth: " . trim((string) $state['month']);
             }
 
-            FeeTransaction::create([
+            $transaction = FeeTransaction::create([
                 'school_id' => $tenant->id,
                 'ledger_id' => $ledger->id,
                 'paid_amount' => $payAmount,
@@ -324,13 +424,26 @@ class Fees extends Page implements HasForms
                 'note' => trim(($state['note'] ?? '') . $extraNote),
             ]);
 
-            Notification::make()->title('Fee payment saved')->success()->send();
+            Notification::make()
+                ->title('Fee payment saved')
+                ->body('Receipt No: ' . $transaction->receipt_no)
+                ->success()
+                ->actions([
+                    \Filament\Notifications\Actions\Action::make('download_receipt')
+                        ->label('Download Receipt')
+                        ->url(route('receipts.fee.transaction.download', $transaction->id))
+                        ->openUrlInNewTab(),
+                ])
+                ->send();
         }
 
-        // Reset form (keep mode)
+        // Reset form and hide it, then refresh table
+        $this->showForm = false;
+        $this->resetTable();
         $this->form->fill([
             'mode' => $state['mode'] ?? 'monthly',
             'payment_date' => now()->toDateString(),
+            'academic_year' => now()->format('Y') . '-' . now()->addYear()->format('Y'),
             'student_id' => null,
             'paid_amount' => null,
             'month' => now()->format('F'),

@@ -24,17 +24,53 @@ class ClassroomResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Classroom')
+                Forms\Components\Select::make('grade')
+                    ->label('Class')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('section')
+                    ->options([
+                        'Nursery' => 'Nursery',
+                        'LKG' => 'LKG',
+                        'UKG' => 'UKG',
+                        '1' => '1',
+                        '2' => '2',
+                        '3' => '3',
+                        '4' => '4',
+                        '5' => '5',
+                        '6' => '6',
+                        '7' => '7',
+                        '8' => '8',
+                        '9' => '9',
+                        '10' => '10',
+                        '11' => '11',
+                        '12' => '12',
+                    ])
+                    ->searchable()
+                    ->native(false),
+                Forms\Components\Select::make('section')
                     ->label('Section')
-                    ->maxLength(255),
+                    ->options([
+                        'A' => 'A',
+                        'B' => 'B',
+                        'C' => 'C',
+                        'D' => 'D',
+                        'E' => 'E',
+                        'F' => 'F',
+                        'G' => 'G',
+                        'H' => 'H',
+                    ])
+                    ->searchable()
+                    ->native(false),
+                Forms\Components\TextInput::make('capacity')
+                    ->label('Capacity')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(100)
+                    ->default(30),
                 Forms\Components\Select::make('teacher_id')
                     ->label('Class Teacher')
                     ->relationship('teacher', 'name')
-                    ->searchable(),
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 
@@ -42,15 +78,64 @@ class ClassroomResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Classroom')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('grade')
+                    ->label('Class')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('section')
-                    ->label('Section'),
-                Tables\Columns\TextColumn::make('teacher.name')->label('Class Teacher'),
-                Tables\Columns\TextColumn::make('students_count')->counts('students')->label('Students'),
+                    ->label('Section')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('capacity')
+                    ->label('Capacity')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('teacher.name')
+                    ->label('Class Teacher')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('students_count')
+                    ->counts('students')
+                    ->label('Students')
+                    ->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('grade')
+                    ->label('Class')
+                    ->options([
+                        'Nursery' => 'Nursery',
+                        'LKG' => 'LKG',
+                        'UKG' => 'UKG',
+                        '1' => '1',
+                        '2' => '2',
+                        '3' => '3',
+                        '4' => '4',
+                        '5' => '5',
+                        '6' => '6',
+                        '7' => '7',
+                        '8' => '8',
+                        '9' => '9',
+                        '10' => '10',
+                        '11' => '11',
+                        '12' => '12',
+                    ]),
+                Tables\Filters\SelectFilter::make('section')
+                    ->options([
+                        'A' => 'A',
+                        'B' => 'B',
+                        'C' => 'C',
+                        'D' => 'D',
+                        'E' => 'E',
+                        'F' => 'F',
+                        'G' => 'G',
+                        'H' => 'H',
+                    ]),
+            ])
+            ->defaultSort('grade', 'asc')
+            ->groups([
+                Tables\Grouping\Group::make('grade')
+                    ->label('Class')
+                    ->collapsible(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

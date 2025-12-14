@@ -12,20 +12,31 @@ class Classroom extends Model
 {
     use BelongsToSchool;
 
+    protected $fillable = [
+        'school_id',
+        'name',
+        'grade',
+        'section',
+        'capacity',
+        'teacher_id',
+    ];
+
     /**
      * The "booted" method of the model.
      */
     protected static function booted(): void
     {
         static::addGlobalScope(new TenantScope);
-    }
 
-    protected $fillable = [
-        'school_id',
-        'name',
-        'section',
-        'teacher_id',
-    ];
+        // Auto-generate name from grade and section when saving
+        static::saving(function ($classroom) {
+            if ($classroom->grade && $classroom->section) {
+                $classroom->name = $classroom->grade . ' - ' . $classroom->section;
+            } elseif ($classroom->grade) {
+                $classroom->name = $classroom->grade;
+            }
+        });
+    }
 
     public function teacher(): BelongsTo
     {

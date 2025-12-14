@@ -45,11 +45,6 @@ class StudentResource extends Resource
                     ->options(fn () => Classroom::query()->pluck('name', 'id'))
                     ->searchable()
                     ->relationship('classroom', 'name'),
-                Forms\Components\TextInput::make('class')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('section')
-                    ->maxLength(255),
                 Forms\Components\Select::make('gender')
                     ->label('Gender')
                     ->options([
