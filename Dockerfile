@@ -1,5 +1,5 @@
 # Multi-stage build for Laravel application
-FROM php:8.2-fpm-alpine AS base
+FROM php:8.3-fpm-alpine AS base
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -10,6 +10,8 @@ RUN apk add --no-cache \
     zip \
     unzip \
     oniguruma-dev \
+    postgresql-dev \
+    icu-dev \
     mysql-client \
     nodejs \
     npm \
@@ -21,12 +23,14 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     exif \
     pcntl \
     bcmath \
     gd \
-    zip
+    zip \
+    intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
