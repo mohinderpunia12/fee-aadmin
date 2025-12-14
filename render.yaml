@@ -1,0 +1,86 @@
+services:
+  - type: web
+    name: fee-admin
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: oregon
+    envVars:
+      - key: APP_NAME
+        value: FeeAdmin
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        sync: false
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: fee-admin-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: fee-admin-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: fee-admin-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: fee-admin-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: fee-admin-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_SECURE_COOKIE
+        value: true
+      - key: SESSION_HTTP_ONLY
+        value: true
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: CACHE_DRIVER
+        value: redis
+      - key: QUEUE_CONNECTION
+        value: redis
+      - key: REDIS_HOST
+        fromService:
+          name: fee-admin-redis
+          type: redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          name: fee-admin-redis
+          type: redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          name: fee-admin-redis
+          type: redis
+          property: password
+    buildCommand: ""
+    startCommand: ""
+    healthCheckPath: /
+    autoDeploy: true
+
+databases:
+  - name: fee-admin-db
+    plan: starter
+    databaseName: feeadmin
+    user: feeadmin
+
+  - name: fee-admin-redis
+    type: redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+
