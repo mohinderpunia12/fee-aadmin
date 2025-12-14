@@ -6,13 +6,15 @@ name = "fee-admin"
 version = "1.0.0"
 description = "Multi-Tenant School Management SaaS"
 
-[build]
-# PHP version - use 8.4 to match composer.lock requirements
+[dependencies]
 php = "8.4"
 
+[php]
+# Explicitly list ONLY MySQL extensions - this prevents Shipit from detecting PostgreSQL
+extensions = ["pdo_mysql", "mbstring", "exif", "pcntl", "bcmath", "gd", "zip", "intl"]
+
+[build]
 # Build command
-# Note: This runs inside Docker build, so we can't fix the Dockerfile here
-# The fix must happen via hooks or prepare script
 build-command = "composer install --optimize-autoloader --no-dev --no-scripts && npm ci && npm run build"
 
 # Start command  
