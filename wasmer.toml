@@ -16,5 +16,6 @@ build-command = "composer install --optimize-autoloader --no-dev --no-scripts &&
 # Start command  
 start-command = "php artisan serve --host=0.0.0.0 --port=8080"
 
-# Database: Use MySQL (pdo_mysql is included in PHP by default)
-# Do not install PostgreSQL extensions
+# Database: Use MySQL ONLY (pdo_mysql is included in PHP by default)
+# IMPORTANT: Do NOT install PostgreSQL extensions
+# The prepare.sh script will remove any PostgreSQL installation attempts
