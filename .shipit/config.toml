@@ -9,4 +9,6 @@ ignore-packages = ["libpq-dev", "postgresql-dev", "postgresql"]
 [build]
 # Use MySQL only
 database = "mysql"
+# Use custom Dockerfile if available
+dockerfile = "Dockerfile.wasmer"
 
