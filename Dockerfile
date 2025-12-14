@@ -1,5 +1,5 @@
-# Multi-stage build for Laravel application
-FROM php:8.4-fpm-alpine AS base
+# Production-ready Laravel + Filament Dockerfile for Render
+FROM php:8.4-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -15,15 +15,15 @@ RUN apk add --no-cache \
     mysql-client \
     nodejs \
     npm \
-    supervisor \
     nginx \
     bash \
     procps
 
-# Install PHP extensions
+# Install PHP extensions required for Laravel + Filament + PostgreSQL
 RUN docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
+    pgsql \
     mbstring \
     exif \
     pcntl \
@@ -38,11 +38,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files
+# Copy composer files first for better layer caching
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Install PHP dependencies (production only)
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --optimize-autoloader
 
 # Copy application files
 COPY . .
@@ -53,29 +53,21 @@ RUN composer dump-autoload --optimize --classmap-authoritative
 # Install Node dependencies and build assets
 RUN npm ci && npm run build && rm -rf node_modules
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# Production stage
-FROM base AS production
-
 # Copy nginx configuration
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/http.d/default.conf
-
-# Copy supervisor configuration
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Create necessary directories
-RUN mkdir -p /var/log/nginx /var/log/php-fpm
+# Create necessary directories and set permissions
+RUN mkdir -p /var/log/nginx /var/log/php-fpm \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Expose port
+# Expose port 80
 EXPOSE 80
 
 # Health check
