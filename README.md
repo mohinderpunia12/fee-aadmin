@@ -237,12 +237,51 @@ LOG_LEVEL=error
 
 ### Troubleshooting
 
+#### Composer Installation Fails
+
+**Error: "Your requirements could not be resolved to an installable set of packages"**
+
+This usually means:
+1. **PHP Version Issue**: Laravel 11 requires PHP 8.2 or higher
+   - Check your PHP version in Hostinger hPanel → **PHP Configuration**
+   - Ensure PHP 8.2 or 8.3 is selected
+   - If PHP 8.2+ is not available, contact Hostinger support to upgrade
+
+2. **Memory Limit**: Composer might be running out of memory
+   - Via SSH, try: `php -d memory_limit=512M /usr/local/bin/composer install --no-dev --optimize-autoloader`
+   - Or increase memory limit in Hostinger PHP settings
+
+3. **Missing PHP Extensions**: Ensure these extensions are enabled:
+   - `php-mbstring`
+   - `php-xml`
+   - `php-curl`
+   - `php-zip`
+   - `php-gd`
+   - `php-mysql` or `php-mysqli`
+   - `php-openssl`
+   - `php-json`
+   - `php-fileinfo`
+   - `php-tokenizer`
+   - `php-pdo`
+
+4. **Composer Version**: Hostinger might have an old Composer version
+   - Try updating Composer: `composer self-update`
+   - Or use: `php composer.phar install --no-dev --optimize-autoloader`
+
+5. **Install Without Dev Dependencies** (Recommended for production):
+   ```bash
+   composer install --no-dev --optimize-autoloader --no-interaction
+   ```
+
+#### Other Common Issues
+
 - **500 Internal Server Error**: Check file permissions (`chmod -R 755 storage bootstrap/cache`)
-- **Database connection errors**: Verify database credentials in `.env` and ensure database exists
+- **Database connection errors**: Verify database credentials in `.htaccess` (SetEnv) and ensure database exists
 - **Assets not loading**: Run `npm run build` and ensure `public/build` directory exists
 - **Storage issues**: Ensure storage directory has write permissions and `storage:link` is created
 - **Route not found**: Clear route cache: `php artisan route:clear`
 - **Permission denied**: Check file ownership and permissions via SSH
+- **Environment variables not working**: Ensure `.htaccess` SetEnv directives are correct and PHP version supports them
 
 ### Updating Your Application
 

@@ -27,7 +27,6 @@ class Student extends Model
         'name',
         'email',
         'enrollment_no',
-        'class',
         'section',
         'gender',
         'address',

@@ -48,8 +48,6 @@ class StudentsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('class')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('section')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('today_attendance')
@@ -129,7 +127,8 @@ class StudentsRelationManager extends RelationManager
                                         
                                         $descriptions = [];
                                         foreach ($students as $student) {
-                                            $descriptions[$student->id] = 'Class: ' . $student->class . ($student->section ? ' - ' . $student->section : '');
+                                            $classroomName = $student->classroom ? $student->classroom->name : 'No Classroom';
+                                            $descriptions[$student->id] = 'Classroom: ' . $classroomName . ($student->section ? ' - Section: ' . $student->section : '');
                                         }
                                         return $descriptions;
                                     })

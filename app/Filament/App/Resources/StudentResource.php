@@ -103,7 +103,7 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('enrollment_no')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('email')->searchable(),
-                Tables\Columns\TextColumn::make('class')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('classroom.name')->label('Classroom')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('section')->searchable(),
                 Tables\Columns\TextColumn::make('gender')
                     ->badge()
@@ -119,7 +119,6 @@ class StudentResource extends Resource
                         'other' => 'warning',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('classroom.name')->label('Classroom')->searchable(),
                 Tables\Columns\TextColumn::make('parent_phone')->searchable(),
                 Tables\Columns\TextColumn::make('parent_phone_secondary')->label('Secondary Phone')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -128,13 +127,11 @@ class StudentResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('class')
-                    ->options(function () {
-                        return Student::query()
-                            ->distinct()
-                            ->pluck('class', 'class')
-                            ->toArray();
-                    }),
+                Tables\Filters\SelectFilter::make('classroom_id')
+                    ->label('Classroom')
+                    ->relationship('classroom', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\Action::make('download_id')

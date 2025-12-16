@@ -40,10 +40,10 @@ class AddStudentsWithParent extends Page implements HasForms
                     'name' => '',
                     'enrollment_no' => '',
                     'email' => '',
-                    'class' => '',
                     'section' => '',
                     'gender' => null,
                     'address' => '',
+                    'classroom_id' => null,
                     'annual_fee' => 0,
                     'previous_year_balance' => 0,
                 ],
@@ -108,7 +108,6 @@ class AddStudentsWithParent extends Page implements HasForms
                                     'name' => '',
                                     'enrollment_no' => '',
                                     'email' => '',
-                                    'class' => '',
                                     'section' => '',
                                     'gender' => null,
                                     'address' => '',
@@ -140,10 +139,6 @@ class AddStudentsWithParent extends Page implements HasForms
                                 ->label('Classroom')
                                 ->options(fn () => Classroom::query()->pluck('name', 'id'))
                                 ->searchable(),
-                            Forms\Components\TextInput::make('class')
-                                ->label('Class')
-                                ->required()
-                                ->maxLength(255),
                             Forms\Components\TextInput::make('section')
                                 ->label('Section')
                                 ->maxLength(255),
@@ -228,7 +223,6 @@ class AddStudentsWithParent extends Page implements HasForms
                 'name' => $childData['name'],
                 'email' => $childData['email'] ?? null,
                 'enrollment_no' => $childData['enrollment_no'],
-                'class' => $childData['class'],
                 'section' => $childData['section'] ?? null,
                 'gender' => $childData['gender'] ?? null,
                 'address' => $childData['address'] ?? null,
@@ -283,10 +277,10 @@ class AddStudentsWithParent extends Page implements HasForms
                     'name' => '',
                     'enrollment_no' => '',
                     'email' => '',
-                    'class' => '',
                     'section' => '',
                     'gender' => null,
                     'address' => '',
+                    'classroom_id' => null,
                     'annual_fee' => 0,
                     'previous_year_balance' => 0,
                 ],

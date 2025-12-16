@@ -32,8 +32,6 @@ class ClassInfoPage extends Page implements HasInfolists
                     ->schema([
                         Infolists\Components\TextEntry::make('classroom.name')
                             ->label('Classroom Name'),
-                        Infolists\Components\TextEntry::make('class')
-                            ->label('Class'),
                         Infolists\Components\TextEntry::make('section')
                             ->label('Section'),
                         Infolists\Components\TextEntry::make('classroom.teacher.name')
