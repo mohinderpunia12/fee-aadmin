@@ -70,156 +70,141 @@ php artisan serve
 - Laravel 11
 - Filament v3
 - MySQL
-- Docker (for deployment)
-- Nginx + PHP-FPM
+- PHP 8.1+
 
-## Docker Development
+## Deployment on Hostinger
 
-### Prerequisites
-- Docker and Docker Compose installed
-
-### Quick Start with Docker
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd fee-aadmin
-```
-
-2. Copy environment file:
-```bash
-cp .env.example .env
-```
-
-3. Update `.env` with your database credentials (or use defaults for Docker Compose)
-
-4. Start services:
-```bash
-docker-compose up -d
-```
-
-5. Run migrations and create storage link:
-```bash
-docker-compose exec app php artisan migrate --force
-docker-compose exec app php artisan storage:link
-```
-
-6. Create a super admin user:
-```bash
-docker-compose exec app php artisan tinker
->>> User::create(['name' => 'Super Admin', 'email' => 'admin@example.com', 'password' => Hash::make('password'), 'school_id' => null])
-```
-
-7. Access the application:
-- Application: http://localhost:8080
-- Database: localhost:3306
-- Redis: localhost:6379
-
-### Docker Commands
-
-```bash
-# View logs
-docker-compose logs -f app
-
-# Stop services
-docker-compose down
-
-# Rebuild containers
-docker-compose build --no-cache
-
-# Access app container
-docker-compose exec app sh
-
-# Run artisan commands
-docker-compose exec app php artisan <command>
-```
-
-## Deployment on Render
-
-This application is configured for deployment on Render using Docker.
+This application is configured for deployment on Hostinger using Git.
 
 ### Prerequisites
-- Render account
-- GitHub repository with the code
+- Hostinger hosting account with PHP 8.1+ support
+- Git repository (GitHub, GitLab, or Bitbucket)
+- MySQL database created in Hostinger control panel
 
 ### Deployment Steps
 
-#### Option 1: Using render.yaml (Recommended)
+1. **Prepare Your Repository:**
+   - Ensure all code is committed and pushed to your Git repository
+   - Make sure `.env` is in `.gitignore` (it should be by default)
 
-1. Push your code to GitHub
+2. **Connect Git to Hostinger:**
+   - Log in to your Hostinger control panel (hPanel)
+   - Navigate to **Website** → **Git Version Control**
+   - Click **Connect Repository**
+   - Connect your Git provider (GitHub, GitLab, or Bitbucket)
+   - Select your repository and branch (usually `main` or `master`)
+   - Set the deployment path (usually `public_html` or your domain folder)
+   - Click **Deploy**
 
-2. In Render Dashboard:
-   - Click "New +" → "Blueprint"
-   - Connect your GitHub repository
-   - Render will automatically detect `render.yaml` and create all services
-
-3. Configure environment variables in Render Dashboard:
-   - `APP_KEY`: Generate with `php artisan key:generate`
-   - `APP_URL`: Your Render service URL
-   - Add any other required environment variables
-
-4. After deployment, run migrations:
-   ```bash
-   # Via Render Shell or SSH
-   php artisan migrate --force
-   php artisan storage:link
-   ```
-
-#### Option 2: Manual Setup
-
-1. **Create Database Service:**
-   - Type: PostgreSQL or MySQL
-   - Name: `fee-admin-db`
-   - Plan: Starter or higher
-
-2. **Create Redis Service:**
-   - Type: Redis
-   - Name: `fee-admin-redis`
-   - Plan: Starter or higher
-
-3. **Create Web Service:**
-   - Environment: Docker
-   - Dockerfile Path: `./Dockerfile`
-   - Build Command: (leave empty, handled by Dockerfile)
-   - Start Command: (leave empty, handled by Dockerfile)
-   - Environment Variables:
-     ```
+3. **Configure Environment Variables:**
+   - In Hostinger hPanel, navigate to your domain's file manager
+   - Create or edit `.env` file in the root directory
+   - Add the following configuration:
+     ```env
+     APP_NAME="FeeAdmin"
      APP_ENV=production
      APP_DEBUG=false
-     APP_URL=https://your-app.onrender.com
-     DB_HOST=<from-database-service>
-     DB_DATABASE=<from-database-service>
-     DB_USERNAME=<from-database-service>
-     DB_PASSWORD=<from-database-service>
-     REDIS_HOST=<from-redis-service>
-     REDIS_PORT=<from-redis-service>
-     REDIS_PASSWORD=<from-redis-service>
+     APP_URL=https://yourdomain.com
+     APP_KEY=<generate-this-locally-or-via-ssh>
+     
+     DB_CONNECTION=mysql
+     DB_HOST=localhost
+     DB_PORT=3306
+     DB_DATABASE=<your-database-name>
+     DB_USERNAME=<your-database-username>
+     DB_PASSWORD=<your-database-password>
+     
      SESSION_DRIVER=database
      SESSION_SECURE_COOKIE=true
-     CACHE_DRIVER=redis
-     LOG_CHANNEL=stderr
+     SESSION_HTTP_ONLY=true
+     SESSION_SAME_SITE=lax
+     
+     CACHE_DRIVER=file
+     QUEUE_CONNECTION=sync
+     
+     LOG_CHANNEL=daily
      LOG_LEVEL=error
      ```
 
-4. **Run Initial Setup:**
-   - Use Render Shell to run:
+4. **Set Up Database:**
+   - In Hostinger hPanel, go to **Databases** → **MySQL Databases**
+   - Create a new database and user
+   - Note down the database credentials
+   - Update your `.env` file with these credentials
+
+5. **Deploy via SSH (Recommended):**
+   - Access your Hostinger account via SSH
+   - Navigate to your project directory:
+     ```bash
+     cd ~/domains/yourdomain.com/public_html
+     ```
+   - Install dependencies:
+     ```bash
+     composer install --no-dev --optimize-autoloader
+     npm install
+     npm run build
+     ```
+   - Generate application key:
+     ```bash
+     php artisan key:generate
+     ```
+   - Run migrations:
      ```bash
      php artisan migrate --force
+     ```
+   - Create storage link:
+     ```bash
      php artisan storage:link
-     php artisan key:generate --force
+     ```
+   - Set proper permissions:
+     ```bash
+     chmod -R 755 storage bootstrap/cache
+     chmod -R 755 public
+     ```
+   - Clear and cache configuration:
+     ```bash
+     php artisan config:cache
+     php artisan route:cache
+     php artisan view:cache
+     ```
+
+6. **Configure Web Server:**
+   - Ensure your `.htaccess` file in `public` directory is properly configured
+   - Point your domain's document root to the `public` directory
+   - In Hostinger, this is usually done automatically, but verify in **Domains** → **Your Domain** → **Document Root**
+
+7. **Create Super Admin User:**
+   - Via SSH, run:
+     ```bash
+     php artisan tinker
+     ```
+   - Then execute:
+     ```php
+     User::create([
+         'name' => 'Super Admin',
+         'email' => 'admin@yourdomain.com',
+         'password' => Hash::make('your-secure-password'),
+         'school_id' => null
+     ]);
      ```
 
 ### Post-Deployment
 
-1. Create super admin user via Render Shell:
-   ```bash
-   php artisan tinker
-   >>> User::create(['name' => 'Super Admin', 'email' => 'admin@example.com', 'password' => Hash::make('secure-password'), 'school_id' => null])
-   ```
+1. **Verify Deployment:**
+   - Visit your domain: `https://yourdomain.com`
+   - Check if the landing page loads correctly
+   - Access admin panel: `https://yourdomain.com/admin`
+   - Login with your super admin credentials
 
-2. Set up file storage:
-   - Render uses ephemeral storage, consider using S3 or similar for file uploads
-   - Update `config/filesystems.php` to use S3 for production
+2. **Set Up File Storage:**
+   - Ensure `storage` directory has write permissions
+   - For production, consider using cloud storage (S3, DigitalOcean Spaces, etc.)
+   - Update `config/filesystems.php` if using cloud storage
+
+3. **Enable SSL:**
+   - Hostinger usually provides free SSL certificates
+   - Enable it in **SSL** section of hPanel
+   - Ensure `APP_URL` in `.env` uses `https://`
 
 ### Environment Variables for Production
 
@@ -228,44 +213,57 @@ Required environment variables:
 APP_NAME="FeeAdmin"
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://your-app.onrender.com
+APP_URL=https://yourdomain.com
 APP_KEY=<generated-key>
 
 DB_CONNECTION=mysql
-DB_HOST=<database-host>
+DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=<database-name>
 DB_USERNAME=<database-user>
 DB_PASSWORD=<database-password>
-
-REDIS_HOST=<redis-host>
-REDIS_PORT=6379
-REDIS_PASSWORD=<redis-password>
 
 SESSION_DRIVER=database
 SESSION_SECURE_COOKIE=true
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=lax
 
-CACHE_DRIVER=redis
-QUEUE_CONNECTION=redis
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
 
-LOG_CHANNEL=stderr
+LOG_CHANNEL=daily
 LOG_LEVEL=error
 ```
 
 ### Troubleshooting
 
-- **Build fails**: Check Docker logs in Render dashboard
-- **Database connection errors**: Verify database credentials and network access
-- **Storage issues**: Ensure storage directory has correct permissions
-- **Asset build fails**: Check Node.js version compatibility
+- **500 Internal Server Error**: Check file permissions (`chmod -R 755 storage bootstrap/cache`)
+- **Database connection errors**: Verify database credentials in `.env` and ensure database exists
+- **Assets not loading**: Run `npm run build` and ensure `public/build` directory exists
+- **Storage issues**: Ensure storage directory has write permissions and `storage:link` is created
+- **Route not found**: Clear route cache: `php artisan route:clear`
+- **Permission denied**: Check file ownership and permissions via SSH
+
+### Updating Your Application
+
+1. Push changes to your Git repository
+2. In Hostinger hPanel, go to **Git Version Control**
+3. Click **Pull** or **Deploy** to update your files
+4. Via SSH, run:
+   ```bash
+   composer install --no-dev --optimize-autoloader
+   php artisan migrate --force
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
 
 ## Production Considerations
 
-- Use Redis for caching and sessions in production
-- Configure proper file storage (S3, etc.) for uploaded files
-- Set up SSL/TLS certificates (handled by Render)
-- Configure backup strategy for database
-- Set up monitoring and logging
+- Set `APP_DEBUG=false` in production
+- Use strong passwords for database and admin accounts
+- Enable SSL/TLS certificates (usually automatic on Hostinger)
+- Configure regular database backups via Hostinger control panel
+- Set up file storage for uploaded files (consider cloud storage for scalability)
 - Review security settings in `SECURITY_CONFIG.md`
+- Monitor application logs in `storage/logs/`

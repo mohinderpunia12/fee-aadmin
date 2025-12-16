@@ -2784,3 +2784,17 @@ sh: node: command not found
 #50 /Users/wiredtechie/Desktop/fee-aadmin/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/Users/wiredtec...')
 #51 {main}
 "} 
+[2025-12-14 17:14:35] local.ERROR: No arguments expected for "key" command, got "generate". {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): No arguments expected for \"key\" command, got \"generate\". at /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Input/ArgvInput.php:199)
+[stacktrace]
+#0 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Input/ArgvInput.php(92): Symfony\\Component\\Console\\Input\\ArgvInput->parseArgument('generate')
+#1 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Input/ArgvInput.php(77): Symfony\\Component\\Console\\Input\\ArgvInput->parseToken('generate', true)
+#2 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Input/Input.php(53): Symfony\\Component\\Console\\Input\\ArgvInput->parse()
+#3 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Command/Command.php(295): Symfony\\Component\\Console\\Input\\Input->bind(Object(Symfony\\Component\\Console\\Input\\InputDefinition))
+#4 /Users/wiredtechie/Desktop/fee-aadmin/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#5 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Application.php(1102): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Application.php(356): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Foundation\\Console\\KeyGenerateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#7 /Users/wiredtechie/Desktop/fee-aadmin/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /Users/wiredtechie/Desktop/fee-aadmin/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#9 /Users/wiredtechie/Desktop/fee-aadmin/artisan(17): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#10 {main}
+"} 

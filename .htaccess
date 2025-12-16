@@ -1,0 +1,67 @@
+# ============================================
+# SECURITY: Block access to sensitive files in root
+# ============================================
+# This file provides an extra layer of security
+# Note: On Hostinger, ensure document root points to /public directory
+
+# Block .env files (all variations)
+<FilesMatch "\.env(\.|$)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block sensitive Laravel configuration files
+<FilesMatch "(composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml|\.git|\.gitignore|\.gitattributes|\.htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block backup and temporary files
+<FilesMatch "\.(bak|backup|old|orig|save|swp|tmp|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block database dump files and SQL files
+<FilesMatch "\.(sql|dump|db|sqlite|sqlite3|mdb)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block JWT key files and certificate files
+<FilesMatch "(jwt|jwt-key|\.key|\.pem|\.p12|\.pfx|\.crt|\.cer)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to sensitive directories (if accessed from root)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block direct access to storage directory
+    RewriteRule ^storage/ - [F,L]
+    
+    # Block direct access to vendor directory
+    RewriteRule ^vendor/ - [F,L]
+    
+    # Block direct access to other sensitive directories
+    RewriteRule ^(bootstrap/cache|config|database|routes|app|resources|tests|node_modules)/ - [F,L]
+    
+    # Block attempts to access environment variable names in URLs
+    # Prevents information disclosure through URL parameters
+    RewriteCond %{QUERY_STRING} (DB_PASSWORD|DB_USERNAME|DB_HOST|DB_DATABASE|APP_KEY|JWT_SECRET|AWS_SECRET|REDIS_PASSWORD|MAIL_PASSWORD|SESSION_SECURE_COOKIE) [NC]
+    RewriteRule ^ - [F,L]
+    
+    # Block access to database-related directories
+    RewriteCond %{REQUEST_URI} ^/(backup|backups|dump|dumps|database|db|sql) [NC]
+    RewriteRule ^ - [F,L]
+    
+    # Block access to files containing sensitive variable names
+    RewriteCond %{REQUEST_URI} (\.env|database|config|secret|key|password|credential|jwt) [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule !^public/ - [F,L]
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
